@@ -14,6 +14,18 @@ st.set_page_config(
     layout="wide",
 )
 
+st.markdown(
+    """
+    <style>
+    .st-key-catalog_results_section [role="columnheader"],
+    .st-key-catalog_results_section [role="gridcell"] {
+        font-size: 17px;
+    }
+    </style>
+    """,
+    unsafe_allow_html=True,
+)
+
 
 @st.cache_data(show_spinner=False)
 def load_catalog(path: Path) -> pd.DataFrame:
@@ -210,7 +222,7 @@ with overview_tab:
             icon=":material/download:",
         )
 
-    with st.container(border=True):
+    with st.container(border=True, key="catalog_results_section"):
         st.subheader("Catalog results")
         st.caption(f"Showing {len(filtered):,} titles. Sort columns or narrow the sidebar filters.")
         display_columns = [
