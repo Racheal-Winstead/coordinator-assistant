@@ -122,32 +122,59 @@ all_ratings = sorted(catalog["rating"].dropna().unique().tolist())
 min_year = int(catalog["release_year"].min())
 max_year = int(catalog["release_year"].max())
 
+filter_defaults = {
+    "filter_query": "",
+    "filter_types": [],
+    "filter_genres": [],
+    "filter_countries": [],
+    "filter_ratings": [],
+    "filter_years": (min_year, max_year),
+}
+for key, default in filter_defaults.items():
+    st.session_state.setdefault(key, default)
+
+
+def reset_filters() -> None:
+    st.session_state.update(filter_defaults)
+
 with st.sidebar:
     st.header("Catalog filters")
     query = st.text_input(
         "Search catalog",
         placeholder="Title, description, director, or cast",
         icon=":material/search:",
+        key="filter_query",
     )
     selected_types = st.pills(
-        "Content type", ["Movie", "TV Show"], selection_mode="multi"
+        "Content type",
+        ["Movie", "TV Show"],
+        selection_mode="multi",
+        key="filter_types",
     )
-    selected_genres = st.multiselect("Genres", all_genres, placeholder="All genres")
+    selected_genres = st.multiselect(
+        "Genres", all_genres, placeholder="All genres", key="filter_genres"
+    )
     selected_countries = st.multiselect(
-        "Countries and regions", all_countries, placeholder="All countries"
+        "Countries and regions",
+        all_countries,
+        placeholder="All countries",
+        key="filter_countries",
     )
-    selected_ratings = st.multiselect("Ratings", all_ratings, placeholder="All ratings")
+    selected_ratings = st.multiselect(
+        "Ratings", all_ratings, placeholder="All ratings", key="filter_ratings"
+    )
     selected_years = st.slider(
         "Release years",
         min_value=min_year,
         max_value=max_year,
-        value=(min_year, max_year),
+        key="filter_years",
     )
-    if st.button("Reset filters", icon=":material/restart_alt:", width="stretch"):
-        for key in list(st.session_state):
-            if key != "work_queue":
-                del st.session_state[key]
-        st.rerun()
+    st.button(
+        "Reset filters",
+        icon=":material/restart_alt:",
+        width="stretch",
+        on_click=reset_filters,
+    )
     st.caption("Filters apply to every dashboard view.")
 
 filtered = apply_filters(
